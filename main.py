@@ -12,7 +12,7 @@ from streamer import Streamer
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--video_path', type=str, default='/mnt/Video-DB/Test_Videos/Short/Datatang-1-China-Location-0-2_S1.mp4',
+    parser.add_argument('--video_path', type=str, required=True,
                         help='Path to the video file')
     parser.add_argument('--min_area', type=int, default=500, help='Minimum area of a detected motion')
     parser.add_argument('--blur', action='store_true', help='Enable blur for detected motion')
