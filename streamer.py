@@ -23,8 +23,6 @@ class Streamer():
             if i % self.skip_frames == 0:
                 queue.put(frame)
             i += 1
-            # if i % 300 == 0:  # Check every 300 frames (adjust as needed)
-            #     clear_queue(queue, num_to_clear=1e6)
 
         cap.release()
         queue.put(None)  # End item

@@ -33,8 +33,8 @@ if __name__ == "__main__":
     p1 = Process(target=streamer.start, args=(queue_stream_detect,))
     p2 = Process(target=detector.start, args=(queue_stream_detect, queue_detect_play))
     p3 = Process(target=player.start, args=(queue_detect_play,))
-    logger.info('Starting processes')
-    p1.start()
+    logger.info('Starting processes ')
+    p1.start( )
     p2.start()
     p3.start()
 

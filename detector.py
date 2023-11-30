@@ -3,12 +3,15 @@ from logging import getLogger
 import cv2
 import imutils
 from utils import clear_queue
+
+
 class Detector():
-    def __init__(self, min_area ,frame_rate ,skip_frames=1):
+    def __init__(self, min_area, frame_rate, skip_frames=1):
         self.min_area = min_area
-        self.frame_rate =frame_rate
+        self.frame_rate = frame_rate
         self.skip_frames = skip_frames
         self.logger = getLogger(self.__class__.__name__)
+
     def start(self, in_queue, out_queue):
         firstFrame = None
         frame_gap_for_detection = int(self.frame_rate / 3)
@@ -46,5 +49,5 @@ class Detector():
             if i % self.skip_frames == 0:
                 out_queue.put((frame, detections))
             i += 1
-            if i%10 == 0:
+            if i % 10 == 0:
                 clear_queue(out_queue)

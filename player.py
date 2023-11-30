@@ -39,9 +39,6 @@ class Player():
             clear_queue(queue,num_to_clear=int(1e5))
             delay =int(1000 / self.frame_rate)
 
-            # Uncomment the next line to use the adjusted delay
-            # time.sleep(delay / 1000.0)
-
             if cv2.waitKey(delay) & 0xFF == ord('q'):
                 break
         self.logger.info('player stopped')
