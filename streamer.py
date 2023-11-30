@@ -1,14 +1,15 @@
 from datetime import datetime
 import cv2
-
+from logging import getLogger, INFO, basicConfig
 class Streamer():
     def __init__(self, src, resize=None, skip_frames=5):
         self.src = src
         self.resize = resize
         self.start_time = datetime.now()
         self.skip_frames = skip_frames
-
+        self.logger = getLogger(self.__class__.__name__)
     def start(self, queue):
+        self.logger.info('Starting streamer')
         cap = cv2.VideoCapture(self.src)
         i = 0
         while cap.isOpened():
@@ -28,6 +29,7 @@ class Streamer():
         cap.release()
         queue.put(None)  # End item
 
+        self.logger.info('streamer stopped')
     def get_frame_rate(self):
         cap = cv2.VideoCapture(self.src)
         return int(cap.get(cv2.CAP_PROP_FPS))

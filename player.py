@@ -1,5 +1,6 @@
 import time
 from datetime import datetime, timedelta
+from logging import getLogger, INFO, basicConfig
 
 import cv2
 from utils import clear_queue
@@ -9,16 +10,12 @@ class Player():
         self.frame_rate = frame_rate
         self.start_time = start_time
         self.skip_frames = skip_frames
-
-    def empty_queue(self, queue):
-        print(f" qs {queue.qsize()}")
-        print(f" empty {queue.empty()}")
-        while not queue.empty():
-            queue.get()
-            print(f" get")
+        self.logger =getLogger(self.__class__.__name__)
+        basicConfig(level=INFO)
 
     def start(self, queue):
         i = 0
+        self.logger.info('Starting player')
         while True:
             item = queue.get()
             i += 1
@@ -40,8 +37,6 @@ class Player():
 
             cv2.imshow('Frame', frame)
             clear_queue(queue,num_to_clear=int(1e5))
-            print(f"qsize {queue.qsize()}")
-            print(int( (self.frame_rate)))
             delay =int(1000 / self.frame_rate)
 
             # Uncomment the next line to use the adjusted delay
@@ -49,3 +44,4 @@ class Player():
 
             if cv2.waitKey(delay) & 0xFF == ord('q'):
                 break
+        self.logger.info('player stopped')
