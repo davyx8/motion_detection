@@ -12,42 +12,36 @@ class Detector():
         self.skip_frames = skip_frames
         self.logger = getLogger(self.__class__.__name__)
 
-    def start(self, in_queue, out_queue):
+    def start(self, in_memory_name, out_memory_name, event, out_event):
+        # Shared memories
+        shared_in_memory = shared_memory.SharedMemory(name=in_memory_name)
+        shared_out_memory = shared_memory.SharedMemory(name=out_memory_name)
+
+        # Numpy Array
+        in_np_array = np.ndarray((720, 1280, 3), dtype=np.uint8, buffer=shared_in_memory.buf)
+        out_np_array = np.ndarray((720, 1280, 3), dtype=np.uint8, buffer=shared_out_memory.buf)
+
         firstFrame = None
         frame_gap_for_detection = int(self.frame_rate / 3)
         self.logger.info('Starting detector')
         i = 0
         detections = []
         while True:
-            frame = in_queue.get()
-
-            if frame is None:  # End item
-                out_queue.put(None)
-                return
+            event.wait()  # wait for event from streamer
+            frame = in_np_array.copy()  # copy frame from shared memory
+            event.clear()  # clear event
 
             detections = []
-
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            gray = cv2.GaussianBlur(gray, (21, 21), 0)
+            ...
 
-            if firstFrame is None:
-                firstFrame = gray
-                continue
-
-            frameDelta = cv2.absdiff(firstFrame, gray)
-            thresh = cv2.threshold(frameDelta, 25, 255, cv2.THRESH_BINARY)[1]
-            thresh = cv2.dilate(thresh, None, iterations=2)
-            cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            cnts = imutils.grab_contours(cnts)
-
-            for c in cnts:
-                if cv2.contourArea(c) < self.min_area:
-                    continue
-
-                (x, y, w, h) = cv2.boundingRect(c)
-                detections.append((x, y, w, h))
             if i % self.skip_frames == 0:
-                out_queue.put((frame, detections))
+                np.copyto(out_np_array, frame)  # copy frame to shared memory
+                out_event.set()  # set event for player
+
             i += 1
-            if i % 10 == 0:
-                clear_queue(out_queue)
+            ...
+
+        # Close shared memory
+        shared_in_memory.close()
+        shared_out_memory.close()
