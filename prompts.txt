@@ -17,5 +17,7 @@ prompts:
 
 8. give me requirements.txt file
 
+9. rewrite code using shared memory, and not queues. use events to signal when streamer player and detector are done.
+
 
 
