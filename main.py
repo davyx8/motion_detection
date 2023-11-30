@@ -26,11 +26,11 @@ if __name__ == "__main__":
 
     detector = Detector(args.min_area, frame_rate, skip_frames=args.skip_frames)
 
-    player = Player(blur=args.blur, frame_rate=frame_rate, start_time=streamer.start_time, skip_frames=args.skip_frames)
+    player = Player(blur=args.blur, frame_rate=frame_rate, start_time=streamer.start_time, skip_frames=args.skip_frames,out_shm_frame=sm_out_frame)
 
     p1 = Process(target=streamer.start, args=(sm_in_frame.name, events,))
     p2 = Process(target=detector.start, args=(sm_in_frame.name, sm_out_frame.name, events, out_event))
-    p3 = Process(target=player.start, args=(queue_detect_play,))  # This must be adapted similarly
+    p3 = Process(target=player.start, args=())  # This must be adapted similarly
 
     p1.start()
     p2.start()
