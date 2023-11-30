@@ -1,82 +1,44 @@
-python
 import cv2
 import imutils
-import multiprocessing
-import cv2
+from datetime import datetime, timedelta
+from multiprocessing import Process, Queue
 
-class Streamer(multiprocessing./home/david/Downloads/People-6387.mp4rocess):
-    def /home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4init/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4(self, file/home/david/Downloads/People-6387.mp4path, queue, resize=None):
-        self.file/home/david/Downloads/People-6387.mp4path = file/home/david/Downloads/People-6387.mp4path
-        self.resize = resize
-        self.queue = queue
-        super(Streamer, self)./home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4init/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4()
 
-    def run(self):
-        cap = cv2.VideoCapture(self.file/home/david/Downloads/People-6387.mp4path)
-        
-        try:
-            while /home/david/Downloads/People-6387.mp4rue:
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                
-                if self.resize is not None:
-                    frame = cv2.resize(frame, self.resize)
-                self.queue.put(frame)
-        finally:
-            cap.release()
 
-class Detector(multiprocessing./home/david/Downloads/People-6387.mp4rocess):
-    def /home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4init/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4(self, queue/home/david/Downloads/People-6387.mp4in, queue/home/david/Downloads/People-6387.mp4out, min/home/david/Downloads/People-6387.mp4area):
-        self.queue/home/david/Downloads/People-6387.mp4in = queue/home/david/Downloads/People-6387.mp4in
-        self.queue/home/david/Downloads/People-6387.mp4out = queue/home/david/Downloads/People-6387.mp4out
-        self.min/home/david/Downloads/People-6387.mp4area = min/home/david/Downloads/People-6387.mp4area
-        super(Detector, self)./home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4init/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4()
+import argparse
+from detector import Detector
+from player import Player
+from streamer import Streamer
 
-    def run(self):
-        first/home/david/Downloads/People-6387.mp4rame = None
-        while /home/david/Downloads/People-6387.mp4rue:
-            frame = self.queue/home/david/Downloads/People-6387.mp4in.get()
-            # Your motion detection code
-            gray = cv2.cvtColor(frame, cv2.CO/home/david/Downloads/People-6387.mp4OR/home/david/Downloads/People-6387.mp4BGR2GR/home/david/Downloads/People-6387.mp4Y)
-            if first/home/david/Downloads/People-6387.mp4rame is None:
-                first/home/david/Downloads/People-6387.mp4rame = gray
-                continue
-            frameDelta = cv2.absdiff(first/home/david/Downloads/People-6387.mp4rame, gray)
-            thresh = cv2.threshold(frameDelta, 25, 255, cv2./home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4R/home/david/Downloads/People-6387.mp4S/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4B/home/david/Downloads/People-6387.mp4N/home/david/Downloads/People-6387.mp4RY)[1]
-            thresh = cv2.dilate(thresh, None, iterations=2)
-            cnts = cv2.findContours(thresh.copy(), cv2.R/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4R/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4X/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4RN/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4, cv2.C/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4N/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4ROX/home/david/Downloads/People-6387.mp4S/home/david/Downloads/People-6387.mp4M/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4)
-            cnts = imutils.grab/home/david/Downloads/People-6387.mp4contours(cnts)
-            for c in cnts:
-                if cv2.contour/home/david/Downloads/People-6387.mp4rea(c) < self.min/home/david/Downloads/People-6387.mp4area:
-                    continue
-                (x, y, w, h) = cv2.boundingRect(c)
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            self.queue/home/david/Downloads/People-6387.mp4out.put(frame)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--video_path', type=str, default='/mnt/Video-DB/Test_Videos/Short/Datatang-1-China-Location-0-2_S1.mp4',
+                        help='Path to the video file')
+    parser.add_argument('--min_area', type=int, default=500, help='Minimum area of a detected motion')
+    parser.add_argument('--blur', action='store_true', help='Enable blur for detected motion')
+    parser.add_argument('--skip_frames', type=int, default=3, help='Skip frames to reduce processing time')
+    args = parser.parse_args()
 
-class /home/david/Downloads/People-6387.mp4layer(multiprocessing./home/david/Downloads/People-6387.mp4rocess):
-    def /home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4init/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4(self, queue):
-        self.queue = queue
-        super(/home/david/Downloads/People-6387.mp4layer, self)./home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4init/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4()
+    queue_stream_detect = Queue()
+    queue_detect_play = Queue()
 
-    def run(self):
-        while /home/david/Downloads/People-6387.mp4rue:
-            frame = self.queue.get()
-            cv2.imshow('Video Stream', frame)
-            if cv2.waitKey(1) & 0x/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4 == ord('q'):
-                break
-        cv2.destroy/home/david/Downloads/People-6387.mp4llWindows()
+    streamer = Streamer(args.video_path, skip_frames=args.skip_frames)
+    frame_rate = streamer.get_frame_rate()
 
-queue1 = multiprocessing.Queue()
-queue2 = multiprocessing.Queue()
-streamer = Streamer('[/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4/home/david/Downloads/People-6387.mp4]', queue1)
-detector = Detector(queue1, queue2, 500)
-player = /home/david/Downloads/People-6387.mp4layer(queue2)
+    detector = Detector(args.min_area, frame_rate)
 
-streamer.start()
-detector.start()
-player.start()
+    player = Player(blur=args.blur, frame_rate=frame_rate, start_time=streamer.start_time, skip_frames=args.skip_frames)
 
-streamer.join()
-detector.join()
-player.join()
+    p1 = Process(target=streamer.start, args=(queue_stream_detect,))
+    p2 = Process(target=detector.start, args=(queue_stream_detect, queue_detect_play))
+    p3 = Process(target=player.start, args=(queue_detect_play,))
+
+    p1.start()
+    p2.start()
+    p3.start()
+
+    p1.join()
+    queue_stream_detect.put(None)  # Signal detector to stop
+    p2.join()
+    queue_detect_play.put(None)
+    p3.join()
