@@ -16,16 +16,16 @@ if __name__ == "__main__":
                         help='Path to the video file')
     parser.add_argument('--min_area', type=int, default=500, help='Minimum area of a detected motion')
     parser.add_argument('--blur', action='store_true', help='Enable blur for detected motion')
-    parser.add_argument('--skip_frames', type=int, default=3, help='Skip frames to reduce processing time')
+    parser.add_argument('--skip_frames', type=int, default=1, help='Skip frames to reduce processing time')
     args = parser.parse_args()
 
-    queue_stream_detect = Queue()
-    queue_detect_play = Queue()
+    queue_stream_detect = Queue(300)
+    queue_detect_play = Queue(300)
 
     streamer = Streamer(args.video_path, skip_frames=args.skip_frames)
     frame_rate = streamer.get_frame_rate()
 
-    detector = Detector(args.min_area, frame_rate)
+    detector = Detector(args.min_area, frame_rate,skip_frames=args.skip_frames)
 
     player = Player(blur=args.blur, frame_rate=frame_rate, start_time=streamer.start_time, skip_frames=args.skip_frames)
 

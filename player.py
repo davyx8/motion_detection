@@ -42,8 +42,10 @@ class Player():
             clear_queue(queue,num_to_clear=int(1e5))
             print(f"qsize {queue.qsize()}")
             print(int( (self.frame_rate)))
-            # time.sleep(100)
-            # if cv2.waitKey(int( 1e4 / (self.frame_rate))) & 0xFF == ord('q'):
-            if cv2.waitKey(50) & 0xFF == ord('q'):
+            delay =int(1000 / self.frame_rate)
+
+            # Uncomment the next line to use the adjusted delay
+            # time.sleep(delay / 1000.0)
+
+            if cv2.waitKey(delay) & 0xFF == ord('q'):
                 break
-            #     break
